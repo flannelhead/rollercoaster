@@ -21,9 +21,9 @@ function BezEditor(canvas) {
     this.canvas.onmousemove = this.mouseMove.bind(this);
     // Some drawing params.
     this.curveWidth = 4.0;
-    this.curveColor = '#666666';
+    this.curveColor = '#657b83';
     this.outlineWidth = 2.0;
-    this.outlineColor = '#cccccc';
+    this.outlineColor = '#eee8d5';
     this.pointRadius = 5.0;
     this.grabRadius = 1.25 * this.pointRadius;
     this.pointRadius2 = Math.pow(this.pointRadius, 2);
@@ -31,7 +31,7 @@ function BezEditor(canvas) {
     // Number of steps to take when drawing the curve.
     this.steps = 100;
     // Control point colors: STATIC, HOVER, DRAG
-    this.pointColors = ['#ff0000', '#ffaa00', '#88aa00'];
+    this.pointColors = ['#dc322f', '#b58900', '#859900'];
 }
 
 BezEditor.PointState = {
