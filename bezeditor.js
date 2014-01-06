@@ -21,10 +21,10 @@ function BezEditor(canvas) {
     this.canvas.onmousemove = this.mouseMove.bind(this);
     // Some drawing params.
     this.curveWidth = 4.0;
-    this.curveColor = '#657b83';
+    this.curveColor = '#073642';
     this.outlineWidth = 2.0;
-    this.outlineColor = '#eee8d5';
-    this.pointRadius = 5.0;
+    this.outlineColor = '#93a1a1';
+    this.pointRadius = 6.0;
     this.grabRadius = 1.25 * this.pointRadius;
     this.pointRadius2 = Math.pow(this.pointRadius, 2);
     this.grabRadius2 = Math.pow(this.grabRadius, 2);
