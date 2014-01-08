@@ -45,6 +45,7 @@ RcEngine.prototype.start = function() {
     // Disable controls.
     this.startButton.style.display = 'none';
     this.stopButton.style.display = 'inline';
+    this.resetButton.disabled = true;
     this.grav.disabled = true;
     this.mass.disabled = true;
     this.controlPoints.disabled = true;
@@ -55,6 +56,7 @@ RcEngine.prototype.stop = function() {
     this.animating = false;
     this.stopButton.style.display = 'none';
     this.startButton.style.display = 'inline';
+    this.resetButton.disabled = false;
     this.grav.disabled = false;
     this.mass.disabled = false;
     this.controlPoints.disabled = false;

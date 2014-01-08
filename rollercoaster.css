@@ -82,7 +82,7 @@ a:active {
 }
 
 #start, #stop {
-    width: 108px;
+    width: 96px;
     height: 36px;
     letter-spacing: 6px;
     font-weight: bold;
@@ -90,7 +90,7 @@ a:active {
 }
 
 #reset {
-    width: 120px;
+    width: 144px;
     height: 36px;
     letter-spacing: 3px;
     font-weight: bold;

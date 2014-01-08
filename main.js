@@ -28,6 +28,7 @@
         canvas.height = controls.offsetHeight;
         canvas.style.width = canvas.width + 'px';
         canvas.style.height = canvas.height + 'px';
+        engine.stop();
         engine.resetCurve();
     }
 
