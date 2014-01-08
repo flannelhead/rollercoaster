@@ -11,11 +11,12 @@
         var controlPoints = document.getElementById('npoints');
         var startButton = document.getElementById('start');
         var stopButton = document.getElementById('stop');
+        var resetButton = document.getElementById('reset');
         var grav = document.getElementById('grav');
         var mass = document.getElementById('mass');
 
-        engine = new RcEngine(canvas, 1e-4, startButton, stopButton, mass, 
-            grav, controlPoints);
+        engine = new RcEngine(canvas, 1e-4, startButton, stopButton,
+            resetButton, mass, grav, controlPoints);
 
         resize();
         window.onresize = resize;

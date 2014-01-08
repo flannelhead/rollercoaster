@@ -2,8 +2,8 @@
  * Creates a new rollercoaster simulation engine instance.
  * @constructor
  */
-function RcEngine(canvas, dt, startButton, stopButton, mass, grav,
-    controlPoints) {
+function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass, 
+    grav, controlPoints) {
     // Get the handles of the UI components.
     this.canvas = canvas;
     this.ctx = this.canvas.getContext('2d');
@@ -13,6 +13,8 @@ function RcEngine(canvas, dt, startButton, stopButton, mass, grav,
     this.stopButton.onclick = this.stop.bind(this);
     this.controlPoints = controlPoints;
     this.controlPoints.onchange = this.resetCurve.bind(this);
+    this.resetButton = resetButton;
+    this.resetButton.onclick = this.resetCurve.bind(this);
     this.grav = grav;
     this.mass = mass;
     // Initialize the curve editor.
