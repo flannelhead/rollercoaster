@@ -26,9 +26,9 @@ Bezier2.prototype.updatePoints = function() {
     }
 
     l = this.n - 2;
-    this.d2points = [];
+    this.ddpoints = [];
     for (var j = 0; j <= l; j++) {
-        this.d2points.push(this.dpoints[j + 1].sub(this.dpoints[j]));
+        this.ddpoints.push(this.dpoints[j + 1].sub(this.dpoints[j]));
     }
 };
 
@@ -38,17 +38,10 @@ Bezier2.prototype.updatePoints = function() {
  * @return {Vector2} The value of the curve at t.
  */
 Bezier2.prototype.f = function(t) {
-    /*var val = this.points[0].mul(Bezier2.bernstein(this.n, 0, t));
-
-    for (var i = 1; i <= this.n; i++) {
-        val = val.add(this.points[i].mul(Bezier2.bernstein(this.n, i, t)));
-    }*/
-
     var val = new Vector2(0.0, 0.0);
     this.points.forEach(function(point, index, array) {
         val = val.add(point.mul(Bezier2.bernstein(this.n, index, t)));
     }, this);
-
     return val;
 };
 
@@ -58,19 +51,11 @@ Bezier2.prototype.f = function(t) {
  * @return {Vector2} The first derivative of the curve at t.
  */
 Bezier2.prototype.d = function(t) {
-    /*var l = this.n - 1;
-    var val = this.dpoints[0].mul(Bezier2.bernstein(l, 0, t));
-
-    for (var i = 1; i <= l; i++) {
-        val = val.add(this.dpoints[i].mul(Bezier2.bernstein(l, i, t)));
-    }*/
-
     var n1 = this.n - 1;
     var val = new Vector2(0.0, 0.0);
     this.dpoints.forEach(function(point, index, array) {
         val = val.add(point.mul(Bezier2.bernstein(n1, index, t)));
     }, this);
-
     return val.mul(this.n);
 };
 
@@ -79,20 +64,12 @@ Bezier2.prototype.d = function(t) {
  * @param {number} t The curve parameter.
  * @return {Vector2} The second derivative of the curve at t.
  */
-Bezier2.prototype.d2 = function(t) {
-    /*var l = this.n - 2;
-    var val = this.d2points[0].mul(Bezier2.bernstein(l, 0, t));
-
-    for (var i = 1; i <= l; i++) {
-        val = val.add(this.d2points[i].mul(Bezier2.bernstein(l, i, t)));
-    }*/
-
+Bezier2.prototype.dd = function(t) {
     var n2 = this.n - 2;
     var val = new Vector2(0.0, 0.0);
-    this.d2points.forEach(function(point, index, array) {
+    this.ddpoints.forEach(function(point, index, array) {
         val = val.add(point.mul(Bezier2.bernstein(n2, index, t)));
     }, this);
-
     return val.mul(this.n * (this.n - 1));
 };
 

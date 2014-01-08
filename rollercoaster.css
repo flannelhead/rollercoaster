@@ -77,3 +77,27 @@ a:active {
     border-top-width: 1px;
 }
 
+#grav, #npoints, #mass {
+    width: 48px;
+}
+
+#start, #stop {
+    width: 108px;
+    height: 36px;
+    letter-spacing: 6px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#reset {
+    width: 120px;
+    height: 36px;
+    letter-spacing: 3px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#stop {
+    display: none;
+}
+

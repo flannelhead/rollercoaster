@@ -13,7 +13,7 @@
     <div id="controls">
         <h3>CONTROLS</h3>
         <br />
-        NUMBER OF CONTROL POINTS:
+        NUMBER OF CONTROL POINTS:<br />
         <select id="npoints">
             <option value="2">2</option>
             <option value="3">3</option>
@@ -25,7 +25,16 @@
             <option value="9">9</option>
             <option value="10">10</option>
         </select>
-        <br />
+        <br /><br />
+        GRAVITATIONAL ACCELERATION:<br />
+        <input type="text" id="grav" value="500" /> pixels / s<sup>2</sup>
+        <br /><br />
+        MASS OF THE CART [TODO]:<br />
+        <input type="text" id="mass" value="1.0" /> kg
+        <br /><br />
+        <button id="start">START</button>
+        <button id="stop">STOP</button>
+        <!--<button id="reset">RESET CURVE</button>-->
     </div>
     <canvas id="main">
         Oops, your browser's an oldie!
@@ -33,6 +42,7 @@
     <div id="footer">
         <small>
             &copy; 2014 Sakari Kapanen.
+            Source code at <a href="https://github.com/Flannelhead/rollercoaster">GitHub</a>.
             <a href="http://ethanschoonover.com/solarized">Solarized color palette</a>
             by Ethan Schoonover.
         </small>

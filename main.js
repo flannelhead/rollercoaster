@@ -1,48 +1,40 @@
 (function() {
     var controls;
-    var header;
     var canvas;
-    var ctx;
-    var editor;
-    var cpSelect;
-    
+    var engine;
+
     // The 'main' routine which is executed when the document has loaded.
     window.onload = function() {
         controls = document.getElementById('controls');
         canvas = document.getElementById('main');
-        header = document.getElementById('header');
-        ctx = canvas.getContext('2d');
-        editor = new BezEditor(canvas);
-        cpSelect = document.getElementById('npoints');
-        cpSelect.onchange = resetEditor;
+
+        var controlPoints = document.getElementById('npoints');
+        var startButton = document.getElementById('start');
+        var stopButton = document.getElementById('stop');
+        var grav = document.getElementById('grav');
+        var mass = document.getElementById('mass');
+
+        engine = new RcEngine(canvas, 1e-4, startButton, stopButton, mass, 
+            grav, controlPoints);
 
         resize();
         window.onresize = resize;
-    
         window.requestAnimationFrame(draw);
     };
     
     function resize() {
-        canvas.width = header.offsetWidth - controls.offsetWidth;
+        canvas.width = window.innerWidth - controls.offsetWidth;
         canvas.height = controls.offsetHeight;
         canvas.style.width = canvas.width + 'px';
         canvas.style.height = canvas.height + 'px';
-        resetEditor();
+        engine.resetCurve();
     }
 
-    function resetEditor() {
-        var order = parseInt(cpSelect.value, 10) - 1;
-        var pad = 50.0;
-        editor.createLinear(new Vector2(pad, canvas.height / 2),
-            new Vector2(canvas.width - pad, canvas.height / 2), order);
-    }
-
-    function draw() {
+    function draw(timestamp) {
         window.requestAnimationFrame(draw);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        editor.draw(true);
+        engine.draw(timestamp);
     }
-    
+
     // Support old browsers.
     window.requestAnimationFrame = window.requestAnimationFrame || 
         window.mozRequestAnimationFrame || 
