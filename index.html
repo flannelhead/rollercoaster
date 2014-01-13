@@ -13,6 +13,12 @@
     <div id="controls">
         <h3>CONTROLS</h3>
         <br />
+        TYPE OF THE CURVE:<br />
+        <select id="type">
+            <option value="0">Bézier</option>
+            <option value="1" selected>Cubic spline</option>
+        </select>
+        <br />
         NUMBER OF CONTROL POINTS:<br />
         <select id="npoints">
             <option value="2">2</option>
@@ -25,20 +31,20 @@
             <option value="9">9</option>
             <option value="10">10</option>
         </select>
-        <br /><br />
+        <br />
         <button id="reset">RESET CURVE</button>
         <br /><br />
         GRAVITATIONAL ACCELERATION:<br />
         <input type="text" id="grav" value="500" /> pixels / s<sup>2</sup>
-        <br /><br />
+        <br />
         MASS OF THE CART [TODO]:<br />
         <input type="text" id="mass" value="1.0" /> kg
-        <br /><br />
+        <br />
         <button id="start">START</button>
         <button id="stop">STOP</button>
     </div>
     <canvas id="main">
-        Oops, your browser's an oldie!
+        Man, your browser's an oldie!
     </canvas>
     <div id="footer">
         <small>

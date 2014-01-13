@@ -1,9 +1,9 @@
 /**
- * A self-contained Bezier curve editor. Only the canvas needs to be given.
+ * A self-contained curve editor. Only the canvas needs to be given.
  * @param canvas The canvas to draw to.
  * @constructor
  */
-function BezierEditor(canvas) {
+function CurveEditor(canvas) {
     this.curve = null;
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
@@ -29,23 +29,28 @@ function BezierEditor(canvas) {
     this.pointRadius2 = Math.pow(this.pointRadius, 2);
     this.grabRadius2 = Math.pow(this.grabRadius, 2);
     // Number of steps to take when drawing the curve.
-    this.steps = 100;
+    this.steps = 200;
     // Control point colors: STATIC, HOVER, DRAG
     this.pointColors = ['#dc322f', '#b58900', '#859900'];
     this.initPadding = 50.0;
 }
 
-BezierEditor.PointState = {
+CurveEditor.PointState = {
     STATIC: 0,
     HOVER: 1,
     DRAG: 2
+};
+
+CurveEditor.CurveType = {
+    BEZIER: 0,
+    SPLINE: 1
 };
 
 /**
  * Creates a linear Bezier curve of the given order.
  * @param {number} order The order of the curve.
  */
-BezierEditor.prototype.createLinear = function(order) {
+CurveEditor.prototype.createLinear = function(order, type) {
     // Create the required number of intermediate control points by 
     // interpolation.
     var points = [];
@@ -59,17 +64,22 @@ BezierEditor.prototype.createLinear = function(order) {
     for (var i = 0; i <= order; i++) {
         points.push(start.add(delta.mul(i / order)));
         // All the points should be static at this time.
-        this.pointStates.push(BezierEditor.PointState.STATIC);
+        this.pointStates.push(CurveEditor.PointState.STATIC);
     }
-    // Create a new Bezier2 object.
-    this.curve = new Bezier2(points);
+    // Create a new curve object.
+    if (type === CurveEditor.CurveType.BEZIER) {
+        this.curve = new Bezier2(points);
+    } else {
+        this.curve = new CubicSpline2(points);
+    }
     this.updateCurve();
 };
 
 /**
  * Precalculates some points along the curve for drawing.
  */
-BezierEditor.prototype.updateCurve = function() {
+CurveEditor.prototype.updateCurve = function() {
+    this.curve.update();
     this.line = [];
     var dt = 1.0 / this.steps;
     var t = 0;
@@ -77,10 +87,13 @@ BezierEditor.prototype.updateCurve = function() {
         this.line.push(this.curve.f(t));
         t += dt;
     }
-    this.curve.updatePoints();
 };
 
-BezierEditor.prototype.draw = function(editing) {
+/**
+ * Draws the curve and optionally the editor interface.
+ * @param {boolean} editing
+ */
+CurveEditor.prototype.draw = function(editing) {
     this.ctx.save();
     if (editing === true) {
         this.ctx.lineJoin = 'round';
@@ -115,12 +128,12 @@ BezierEditor.prototype.draw = function(editing) {
     this.ctx.restore();
 };
 
-BezierEditor.prototype.mouseDown = function(event) {
+CurveEditor.prototype.mouseDown = function(event) {
     var coords = this.eventCoords(event);
     this.curve.points.some(function(point, index, array) {
         if (Math.pow(coords.x - point.x, 2) + 
             Math.pow(coords.y - point.y, 2) < this.grabRadius2) {
-            this.pointStates[index] = BezierEditor.PointState.DRAG;
+            this.pointStates[index] = CurveEditor.PointState.DRAG;
             this.dragging = true;
             this.dragIndex = index;
             return true;
@@ -130,15 +143,15 @@ BezierEditor.prototype.mouseDown = function(event) {
     }, this);
 };
 
-BezierEditor.prototype.mouseUp = function(event) {
+CurveEditor.prototype.mouseUp = function(event) {
     if (this.dragging === true) {
-        this.pointStates[this.dragIndex] = BezierEditor.PointState.HOVER;
+        this.pointStates[this.dragIndex] = CurveEditor.PointState.HOVER;
         this.dragging = false;
         this.dragIndex = -1;
     }
 };
 
-BezierEditor.prototype.mouseMove = function(event) {
+CurveEditor.prototype.mouseMove = function(event) {
     var coords = this.eventCoords(event);
     if (this.dragging === true) {
         this.curve.points[this.dragIndex] = coords;        
@@ -147,9 +160,9 @@ BezierEditor.prototype.mouseMove = function(event) {
         this.curve.points.forEach(function(point, index, array) {
             if (Math.pow(coords.x - point.x, 2) +
                 Math.pow(coords.y - point.y, 2) > this.pointRadius2) {
-                this.pointStates[index] = BezierEditor.PointState.STATIC;
+                this.pointStates[index] = CurveEditor.PointState.STATIC;
             } else {
-                this.pointStates[index] = BezierEditor.PointState.HOVER;
+                this.pointStates[index] = CurveEditor.PointState.HOVER;
             }
         }, this);
     }
@@ -160,7 +173,7 @@ BezierEditor.prototype.mouseMove = function(event) {
  * param event The event object.
  * return {Vector2} The coordinates.
  */
-BezierEditor.prototype.eventCoords = function(event) {
+CurveEditor.prototype.eventCoords = function(event) {
     // TODO: better coordinate conversion.
     // This will do as long as the page fits on the screen without scrolling.
     var x = event.clientX - this.canvas.offsetLeft;

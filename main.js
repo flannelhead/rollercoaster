@@ -9,6 +9,7 @@
         canvas = document.getElementById('main');
 
         var controlPoints = document.getElementById('npoints');
+        var curveType = document.getElementById('type');
         var startButton = document.getElementById('start');
         var stopButton = document.getElementById('stop');
         var resetButton = document.getElementById('reset');
@@ -16,7 +17,7 @@
         var mass = document.getElementById('mass');
 
         engine = new RcEngine(canvas, 1e-4, startButton, stopButton,
-            resetButton, mass, grav, controlPoints);
+            resetButton, mass, grav, controlPoints, curveType);
 
         resize();
         window.onresize = resize;

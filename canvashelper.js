@@ -1,6 +1,9 @@
 var CanvasHelper = {
     /**
      * Draws a circle.
+     * @param {number} x
+     * @param {number} y
+     * @param {number} radius
      */
     drawCircle: function(ctx, x, y, radius) {
         ctx.beginPath();

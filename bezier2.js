@@ -9,14 +9,14 @@ function Bezier2(points) {
     // The Bezier2 curve is feasible only with at least two control points.
     if (points.length >= 2) {
         this.points = points;
-        this.updatePoints();
+        this.update();
     }
 }
 
 /**
  * Recalculates the helper points needed for taking the derivatives.
  */
-Bezier2.prototype.updatePoints = function() {
+Bezier2.prototype.update = function() {
     this.n = this.points.length - 1;
     
     var l = this.n - 1;

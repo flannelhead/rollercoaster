@@ -1,11 +1,13 @@
 /**
  * Solves a system of ODEs: y'(t) = f(t, y)
- * @param {Object} [argsObj] The optional argument object.
  * @constructor
+ * @param {number} stepSize The size of a single integration step.
+ * @param {Object} [argsObj] The optional argument object.
  */
 function Ode(f, stepSize, argsObj) {
     this.f = f;
     this.t = 0.0;
+    /** @type {Array.<number>} */
     this.y = null;
     this.stepSize = stepSize;
     this.argsObj = arguments.length >= 3 ? arguments[2] : void 0;

@@ -3,7 +3,7 @@
  * @constructor
  */
 function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass, 
-    grav, controlPoints) {
+    grav, controlPoints, curveType) {
     // Get the handles of the UI components.
     this.canvas = canvas;
     this.ctx = this.canvas.getContext('2d');
@@ -13,28 +13,36 @@ function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass,
     this.stopButton.onclick = this.stop.bind(this);
     this.controlPoints = controlPoints;
     this.controlPoints.onchange = this.resetCurve.bind(this);
+    this.curveType = curveType;
+    this.curveType.onchange = this.resetCurve.bind(this);
     this.resetButton = resetButton;
     this.resetButton.onclick = this.resetCurve.bind(this);
     this.grav = grav;
     this.mass = mass;
     // Initialize the curve editor.
-    this.editor = new BezierEditor(this.canvas);
+    this.editor = new CurveEditor(this.canvas);
     this.resetCurve();
     // Initialize the integrator.
     this.odeArgs = {};
     this.ode = new Ode(RcEngine.f, dt, this.odeArgs);
-    // Protection to not hang when the browser has been inactive (the 
-    // timestep can grow quite long).
+    // For protection - see function draw.
     this.maxFrameLength = 10 * 1 / 60.0;
     // We're ready to start.
     this.animating = false;
 }
 
+/**
+ * Reset the curve.
+ */
 RcEngine.prototype.resetCurve = function() {
     var order = parseInt(this.controlPoints.value, 10) - 1;
-    this.editor.createLinear(order);
+    var type = parseInt(this.curveType.value, 10);
+    this.editor.createLinear(order, type);
 };
 
+/**
+ * Start the animation.
+ */
 RcEngine.prototype.start = function() {
     // Initialize ODE parameters.
     this.odeArgs.curve = this.editor.curve;
@@ -49,9 +57,13 @@ RcEngine.prototype.start = function() {
     this.grav.disabled = true;
     this.mass.disabled = true;
     this.controlPoints.disabled = true;
+    this.curveType.disabled = true;
     this.animating = true;
 };
 
+/**
+ * Stop the animation.
+ */
 RcEngine.prototype.stop = function() {
     this.animating = false;
     this.stopButton.style.display = 'none';
@@ -60,8 +72,13 @@ RcEngine.prototype.stop = function() {
     this.grav.disabled = false;
     this.mass.disabled = false;
     this.controlPoints.disabled = false;
+    this.curveType.disabled = false;
 };
 
+/**
+ * Draws a frame.
+ * @param {number} timestamp The timestamp.
+ */
 RcEngine.prototype.draw = function(timestamp) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.editor.draw(!(this.animating));
@@ -71,7 +88,10 @@ RcEngine.prototype.draw = function(timestamp) {
         if (this.ode.t === null) {
             this.ode.t = t;
         }
-
+        // If it has been too long since the last frame, we'll have too much
+        // computation to do, so just skip this frame and hope for the best. 
+        // For example, this happens when the browser window or tab has been
+        // inactive for some time.
         if (t - this.ode.t > this.maxFrameLength) {
             this.ode.t = t;
         }
@@ -87,6 +107,14 @@ RcEngine.prototype.draw = function(timestamp) {
     }
 };
 
+/**
+ * The right hand side of the equation of motion of the cart.
+ * @param {number} t The value of time.
+ * @param {Array.<number>} y The array containing the variables y_i - in this
+ * case displacement and velocity.
+ * @param {Object} argsObj The additional arguments supplied to the function.
+ * @return {Array.<number>} The result of the function.
+ */
 RcEngine.f = function(t, y, argsObj) {
     var b = argsObj.curve.f(y[0]);
     var bd = argsObj.curve.d(y[0]);
