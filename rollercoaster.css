@@ -54,6 +54,7 @@ a:active {
     font-size: 12px;
     border-right-width: 1px;
     background-color: #eee8d5;
+    overflow: auto;
 }
 
 #header, #controls {
@@ -82,9 +83,9 @@ a:active {
 }
 
 #start, #stop {
-    width: 96px;
+    width: 84px;
     height: 36px;
-    letter-spacing: 6px;
+    letter-spacing: 3px;
     font-weight: bold;
     text-align: center;
 }
@@ -107,5 +108,9 @@ input, select {
 
 #mass {
     margin: 3px 0 0 12px;
+}
+
+#force {
+    margin: 3px 0 0 6px;
 }
 

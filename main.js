@@ -17,9 +17,11 @@
         var mass = document.getElementById('mass');
         var dt = document.getElementById('dt');
         var solver = document.getElementById('solver');
+        var force = document.getElementById('force');
 
         engine = new RcEngine(canvas, dt, startButton, stopButton,
-            resetButton, mass, grav, controlPoints, curveType, solver);
+            resetButton, mass, grav, controlPoints, curveType, solver,
+            force);
 
         resize();
         window.onresize = resize;

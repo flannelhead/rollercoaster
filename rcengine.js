@@ -3,7 +3,7 @@
  * @constructor
  */
 function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass, 
-    grav, controlPoints, curveType, solver) {
+    grav, controlPoints, curveType, solver, force) {
     // Get the handles of the UI components.
     this.canvas = canvas;
     this.ctx = this.canvas.getContext('2d');
@@ -21,6 +21,8 @@ function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass,
     this.dt.onchange = this.resetOde.bind(this);
     this.solver = solver;
     this.solver.onchange = this.resetOde.bind(this);
+    this.force = force;
+    this.drawForce = this.force.checked;
     this.grav = grav;
     this.mass = mass;
     // Initialize the curve editor.
@@ -74,9 +76,11 @@ RcEngine.prototype.start = function() {
     this.mass.disabled = true;
     this.dt.disabled = true;
     this.solver.disabled = true;
+    this.force.disabled = true;
     this.controlPoints.disabled = true;
     this.curveType.disabled = true;
     this.animating = true;
+    this.drawForce = this.force.checked;
 };
 
 /**
@@ -91,6 +95,7 @@ RcEngine.prototype.stop = function() {
     this.mass.disabled = false;
     this.dt.disabled = false;
     this.solver.disabled = false;
+    this.force.disabled = false;
     this.controlPoints.disabled = false;
     this.curveType.disabled = false;
 };
@@ -118,8 +123,15 @@ RcEngine.prototype.draw = function(timestamp) {
 
         this.ode.integrate(t);
         if (this.ode.y[0] <= 1.0 && this.ode.y[0] >= 0.0) {
-            this.ctx.fillStyle = '#268bd2';
             var pt = this.editor.curve.f(this.ode.y[0]);
+            if (this.drawForce === true) {
+                this.ctx.strokeStyle = '#859900';
+                this.ctx.lineWidth = 3;
+                CanvasHelper.drawVector(this.ctx, pt, 
+                    new Vector2(this.odeArgs.Fx, this.odeArgs.Fy));
+            }
+
+            this.ctx.fillStyle = '#268bd2';
             CanvasHelper.drawCircle(this.ctx, pt.x, pt.y, 10.0);
         } else {
             this.stop();
@@ -136,11 +148,13 @@ RcEngine.prototype.draw = function(timestamp) {
  * @return {Array.<number>} The result of the function.
  */
 RcEngine.f = function(t, y, argsObj) {
-    var b = argsObj.curve.f(y[0]);
     var bd = argsObj.curve.d(y[0]);
     var bdd = argsObj.curve.dd(y[0]);
     var a = -1.0 / bd.squaredNorm() * (bd.dot(bdd) * Math.pow(y[1], 2) +
         argsObj.g * bd.y);
+    argsObj.Fx = argsObj.m * (bdd.x * Math.pow(y[1], 2) + bd.x * a);
+    argsObj.Fy = argsObj.m * (bdd.y * Math.pow(y[1], 2) + bd.y * a +
+        argsObj.g);
     return [y[1], a];
 };
 

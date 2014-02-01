@@ -32,13 +32,23 @@
             <option value="10">10</option>
         </select>
         <br />
+        <button id="start">START</button>
+        <button id="stop">STOP</button>
         <button id="reset">RESET CURVE</button>
         <br /><br />
+        <!--GRAVITATION POTENTIAL:<br />
+        <select id="pot">
+            <option value="0" selected>Linear w.r.t. height</option>
+            <option value="1">Central</option>
+        </select>
+        <br />-->
         GRAVITATIONAL ACCELERATION:<br />
         <input type="text" id="grav" value="500" /> pixels / s<sup>2</sup>
         <br />
-        MASS OF THE CART [TODO]:<br />
-        <input type="text" id="mass" value="1.0" /> kg
+        MASS OF THE CART:<br />
+        <input type="text" id="mass" value="0.05" /> kg
+        <br />
+        SHOW CONSTRAINT FORCE <input type="checkbox" id="force" checked />
         <br /><br />
         INTEGRATOR:<br />
         <select id="solver">
@@ -47,10 +57,8 @@
         </select>
         <br />
         STEPSIZE:<br />
-        <input type="text" id="dt" value="1.0" /> ms
-        <br /><br />
-        <button id="start">START</button>
-        <button id="stop">STOP</button>
+        <input type="text" id="dt" value="0.2" /> ms
+        <br />
     </div>
     <canvas id="main">
         Man, your browser's an oldie!
