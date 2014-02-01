@@ -3,7 +3,8 @@
  * @constructor
  */
 function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass, 
-    grav, controlPoints, curveType, solver, force) {
+    gacc, gcoeff, controlPoints, curveType, solver, force, pot, lin,
+    central) {
     // Get the handles of the UI components.
     this.canvas = canvas;
     this.ctx = this.canvas.getContext('2d');
@@ -18,12 +19,17 @@ function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass,
     this.resetButton = resetButton;
     this.resetButton.onclick = this.resetCurve.bind(this);
     this.dt = dt;
-    this.dt.onchange = this.resetOde.bind(this);
+    //this.dt.onchange = this.resetOde.bind(this);
     this.solver = solver;
     this.solver.onchange = this.resetOde.bind(this);
     this.force = force;
     this.drawForce = this.force.checked;
-    this.grav = grav;
+    this.gacc = gacc;
+    this.gcoeff = gcoeff;
+    this.pot = pot;
+    this.lin = lin;
+    this.central = central;
+    this.pot.onchange = this.changePot.bind(this);
     this.mass = mass;
     // Initialize the curve editor.
     this.editor = new CurveEditor(this.canvas);
@@ -31,6 +37,7 @@ function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass,
     // Initialize the integrator.
     this.odeArgs = {};
     this.resetOde();
+    this.changePot();
     // For protection - see function draw.
     this.maxFrameLength = 10 * 1 / 60.0;
     this.animating = false;
@@ -52,9 +59,24 @@ RcEngine.prototype.resetOde = function() {
     var solver = parseInt(this.solver.value, 10);
     var dt = parseFloat(this.dt.value) * 1e-3;
     if (solver === 0) {
-        this.ode = new OdeEuler(RcEngine.f, dt, this.odeArgs);
+        this.ode = new OdeEuler(RcEngine.fLinear, dt, this.odeArgs);
     } else {
-        this.ode = new OdeRK4(RcEngine.f, dt, this.odeArgs);
+        this.ode = new OdeRK4(RcEngine.fLinear, dt, this.odeArgs);
+    }
+};
+
+RcEngine.prototype.changePot = function() {
+    this.potential = parseInt(this.pot.value, 10);
+    if (this.potential === 0) {
+        this.ode.f = RcEngine.fLinear;
+        this.odeArgs.g = -1.0 * parseFloat(this.gacc.value);
+        this.lin.style.display = 'block';
+        this.central.style.display = 'none';
+    } else {
+        this.ode.f = RcEngine.fCentral;
+        this.odeArgs.g = 1e3 * parseFloat(this.gcoeff.value);
+        this.central.style.display = 'block';
+        this.lin.style.display = 'none';
     }
 };
 
@@ -64,15 +86,20 @@ RcEngine.prototype.resetOde = function() {
 RcEngine.prototype.start = function() {
     // Initialize ODE parameters.
     this.odeArgs.curve = this.editor.curve;
-    this.odeArgs.g = -1.0 * parseFloat(this.grav.value);
+    this.resetOde();
+    this.changePot();
     this.odeArgs.m = parseFloat(this.mass.value);
+    this.odeArgs.cog = new Vector2(this.canvas.width / 2,
+        this.canvas.height / 2);
     this.ode.t = null;
     this.ode.y = [0.0, 0.0];
     // Disable controls.
     this.startButton.style.display = 'none';
     this.stopButton.style.display = 'inline';
     this.resetButton.disabled = true;
-    this.grav.disabled = true;
+    this.gacc.disabled = true;
+    this.gcoeff.disabled = true;
+    this.pot.disabled = true;
     this.mass.disabled = true;
     this.dt.disabled = true;
     this.solver.disabled = true;
@@ -91,7 +118,9 @@ RcEngine.prototype.stop = function() {
     this.stopButton.style.display = 'none';
     this.startButton.style.display = 'inline';
     this.resetButton.disabled = false;
-    this.grav.disabled = false;
+    this.gacc.disabled = false;
+    this.gcoeff.disabled = false;
+    this.pot.disabled = false;
     this.mass.disabled = false;
     this.dt.disabled = false;
     this.solver.disabled = false;
@@ -121,6 +150,12 @@ RcEngine.prototype.draw = function(timestamp) {
             this.ode.t = t;
         }
 
+        if (this.potential === 1) {
+            this.ctx.fillStyle = '#b58900';
+            CanvasHelper.drawCircle(this.ctx, this.odeArgs.cog.x,
+                this.odeArgs.cog.y, 20.0);
+        }
+
         this.ode.integrate(t);
         if (this.ode.y[0] <= 1.0 && this.ode.y[0] >= 0.0) {
             var pt = this.editor.curve.f(this.ode.y[0]);
@@ -147,7 +182,7 @@ RcEngine.prototype.draw = function(timestamp) {
  * @param {Object} argsObj The additional arguments supplied to the function.
  * @return {Array.<number>} The result of the function.
  */
-RcEngine.f = function(t, y, argsObj) {
+RcEngine.fLinear = function(t, y, argsObj) {
     var bd = argsObj.curve.d(y[0]);
     var bdd = argsObj.curve.dd(y[0]);
     var a = -1.0 / bd.squaredNorm() * (bd.dot(bdd) * Math.pow(y[1], 2) +
@@ -155,6 +190,21 @@ RcEngine.f = function(t, y, argsObj) {
     argsObj.Fx = argsObj.m * (bdd.x * Math.pow(y[1], 2) + bd.x * a);
     argsObj.Fy = argsObj.m * (bdd.y * Math.pow(y[1], 2) + bd.y * a +
         argsObj.g);
+    return [y[1], a];
+};
+
+RcEngine.fCentral = function(t, y, argsObj) {
+    var b = argsObj.curve.f(y[0]);
+    var bd = argsObj.curve.d(y[0]);
+    var bdd = argsObj.curve.dd(y[0]);
+    var dist = b.sub(argsObj.cog);
+    var dist32 = 1.0 / Math.pow(dist.norm(), 3/2);
+    var a = -1.0 / bd.squaredNorm() * (bd.dot(bdd) * Math.pow(y[1], 2) +
+        argsObj.g * bd.dot(dist) * dist32);
+    argsObj.Fx = argsObj.m * (bdd.x * Math.pow(y[1], 2) + bd.x * a +
+        argsObj.g * dist.x * dist32);
+    argsObj.Fy = argsObj.m * (bdd.y * Math.pow(y[1], 2) + bd.y * a +
+        argsObj.g * dist.y * dist32);
     return [y[1], a];
 };
 

@@ -36,15 +36,21 @@
         <button id="stop">STOP</button>
         <button id="reset">RESET CURVE</button>
         <br /><br />
-        <!--GRAVITATION POTENTIAL:<br />
+        GRAVITATION POTENTIAL:<br />
         <select id="pot">
             <option value="0" selected>Linear w.r.t. height</option>
             <option value="1">Central</option>
         </select>
-        <br />-->
-        GRAVITATIONAL ACCELERATION:<br />
-        <input type="text" id="grav" value="500" /> pixels / s<sup>2</sup>
         <br />
+        <div id="lin">
+            GRAVITATIONAL ACCELERATION:<br />
+            <input type="text" id="gacc" value="500" />
+            pixels / s<sup>2</sup>
+        </div>
+        <div id="central">
+            GRAVITATIONAL COEFFICIENT (GM):<br />
+            <input type="text" id="gcoeff" value="5" /> x 10<sup>3</sup>
+        </div>
         MASS OF THE CART:<br />
         <input type="text" id="mass" value="0.05" /> kg
         <br />

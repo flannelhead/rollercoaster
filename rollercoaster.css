@@ -78,7 +78,7 @@ a:active {
     border-top-width: 1px;
 }
 
-#dt, #grav, #npoints, #mass {
+#dt, #gacc, #gcoeff, #npoints, #mass {
     width: 48px;
 }
 
