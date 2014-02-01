@@ -77,7 +77,7 @@ a:active {
     border-top-width: 1px;
 }
 
-#grav, #npoints, #mass {
+#dt, #grav, #npoints, #mass {
     width: 48px;
 }
 
@@ -103,5 +103,9 @@ a:active {
 
 input, select {
     margin: 3px 0 6px 12px;
+}
+
+#mass {
+    margin: 3px 0 0 12px;
 }
 

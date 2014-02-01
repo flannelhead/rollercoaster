@@ -4,7 +4,7 @@
  * @param {number} stepSize The size of a single integration step.
  * @param {Object} [argsObj] The optional argument object.
  */
-function Ode(f, stepSize, argsObj) {
+function OdeRK4(f, stepSize, argsObj) {
     this.f = f;
     this.t = 0.0;
     /** @type {Array.<number>} */
@@ -17,7 +17,7 @@ function Ode(f, stepSize, argsObj) {
  * Integrate until the given point of time.
  * @param {number} t The new value of time.
  */
-Ode.prototype.integrate = function(t) {
+OdeRK4.prototype.integrate = function(t) {
     var dt = t - this.t;
     var nSteps = Math.floor(dt / this.stepSize);
     var remainder = dt - nSteps * this.stepSize;
@@ -32,14 +32,14 @@ Ode.prototype.integrate = function(t) {
  * Integrate one time step forward using the 4th order Runge-Kutta method.
  * @param {number} h The length of the step.
  */
-Ode.prototype.step = function(h) {
+OdeRK4.prototype.step = function(h) {
     var hHalf = h / 2.0;
     var k1 = this.f(this.t, this.y, this.argsObj);
-    var k2 = this.f(this.t + hHalf, Ode.newY(this.y, k1, hHalf),
+    var k2 = this.f(this.t + hHalf, OdeRK4.newY(this.y, k1, hHalf),
         this.argsObj);
-    var k3 = this.f(this.t + hHalf, Ode.newY(this.y, k2, hHalf),
+    var k3 = this.f(this.t + hHalf, OdeRK4.newY(this.y, k2, hHalf),
         this.argsObj);
-    var k4 = this.f(this.t + h, Ode.newY(this.y, k3, h),
+    var k4 = this.f(this.t + h, OdeRK4.newY(this.y, k3, h),
         this.argsObj);
 
     var k = [];
@@ -57,7 +57,7 @@ Ode.prototype.step = function(h) {
  * @param {number} a The multiplier.
  * @return {Array.<number>} u + v * a.
  */
-Ode.newY = function(u, v, a) {
+OdeRK4.newY = function(u, v, a) {
     var result = [];
     u.forEach(function(element, index, array) {
         result.push(element + v[index] * a);

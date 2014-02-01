@@ -15,9 +15,11 @@
         var resetButton = document.getElementById('reset');
         var grav = document.getElementById('grav');
         var mass = document.getElementById('mass');
+        var dt = document.getElementById('dt');
+        var solver = document.getElementById('solver');
 
-        engine = new RcEngine(canvas, 1e-4, startButton, stopButton,
-            resetButton, mass, grav, controlPoints, curveType);
+        engine = new RcEngine(canvas, dt, startButton, stopButton,
+            resetButton, mass, grav, controlPoints, curveType, solver);
 
         resize();
         window.onresize = resize;

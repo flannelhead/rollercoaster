@@ -3,7 +3,7 @@
  * @constructor
  */
 function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass, 
-    grav, controlPoints, curveType) {
+    grav, controlPoints, curveType, solver) {
     // Get the handles of the UI components.
     this.canvas = canvas;
     this.ctx = this.canvas.getContext('2d');
@@ -17,6 +17,10 @@ function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass,
     this.curveType.onchange = this.resetCurve.bind(this);
     this.resetButton = resetButton;
     this.resetButton.onclick = this.resetCurve.bind(this);
+    this.dt = dt;
+    this.dt.onchange = this.resetOde.bind(this);
+    this.solver = solver;
+    this.solver.onchange = this.resetOde.bind(this);
     this.grav = grav;
     this.mass = mass;
     // Initialize the curve editor.
@@ -24,10 +28,9 @@ function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass,
     this.resetCurve();
     // Initialize the integrator.
     this.odeArgs = {};
-    this.ode = new Ode(RcEngine.f, dt, this.odeArgs);
+    this.resetOde();
     // For protection - see function draw.
     this.maxFrameLength = 10 * 1 / 60.0;
-    // We're ready to start.
     this.animating = false;
 }
 
@@ -38,6 +41,19 @@ RcEngine.prototype.resetCurve = function() {
     var order = parseInt(this.controlPoints.value, 10) - 1;
     var type = parseInt(this.curveType.value, 10);
     this.editor.createLinear(order, type);
+};
+
+/**
+ * Reset the ODE solver.
+ */
+RcEngine.prototype.resetOde = function() {
+    var solver = parseInt(this.solver.value, 10);
+    var dt = parseFloat(this.dt.value) * 1e-3;
+    if (solver === 0) {
+        this.ode = new OdeEuler(RcEngine.f, dt, this.odeArgs);
+    } else {
+        this.ode = new OdeRK4(RcEngine.f, dt, this.odeArgs);
+    }
 };
 
 /**
@@ -56,6 +72,8 @@ RcEngine.prototype.start = function() {
     this.resetButton.disabled = true;
     this.grav.disabled = true;
     this.mass.disabled = true;
+    this.dt.disabled = true;
+    this.solver.disabled = true;
     this.controlPoints.disabled = true;
     this.curveType.disabled = true;
     this.animating = true;
@@ -71,6 +89,8 @@ RcEngine.prototype.stop = function() {
     this.resetButton.disabled = false;
     this.grav.disabled = false;
     this.mass.disabled = false;
+    this.dt.disabled = false;
+    this.solver.disabled = false;
     this.controlPoints.disabled = false;
     this.curveType.disabled = false;
 };

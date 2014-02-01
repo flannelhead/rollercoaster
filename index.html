@@ -39,7 +39,16 @@
         <br />
         MASS OF THE CART [TODO]:<br />
         <input type="text" id="mass" value="1.0" /> kg
+        <br /><br />
+        INTEGRATOR:<br />
+        <select id="solver">
+            <option value="0">Euler</option>
+            <option value="1" selected>RK4</option>
+        </select>
         <br />
+        STEPSIZE:<br />
+        <input type="text" id="dt" value="1.0" /> ms
+        <br /><br />
         <button id="start">START</button>
         <button id="stop">STOP</button>
     </div>
