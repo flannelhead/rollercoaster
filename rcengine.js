@@ -31,13 +31,13 @@ function RcEngine(canvas, dt, startButton, stopButton, resetButton, mass,
     this.central = central;
     this.pot.onchange = this.changePot.bind(this);
     this.mass = mass;
-    // Initialize the curve editor.
-    this.editor = new CurveEditor(this.canvas);
-    this.resetCurve();
     // Initialize the integrator.
     this.odeArgs = {};
     this.resetOde();
     this.changePot();
+    // Initialize the curve editor.
+    this.editor = new CurveEditor(this.canvas);
+    this.resetCurve();
     // For protection - see function draw.
     this.maxFrameLength = 10 * 1 / 60.0;
     this.animating = false;
@@ -50,6 +50,8 @@ RcEngine.prototype.resetCurve = function() {
     var order = parseInt(this.controlPoints.value, 10) - 1;
     var type = parseInt(this.curveType.value, 10);
     this.editor.createLinear(order, type);
+    this.odeArgs.cog = new Vector2(this.canvas.width / 2,
+        this.canvas.height / 2);
 };
 
 /**
@@ -89,8 +91,6 @@ RcEngine.prototype.start = function() {
     this.resetOde();
     this.changePot();
     this.odeArgs.m = parseFloat(this.mass.value);
-    this.odeArgs.cog = new Vector2(this.canvas.width / 2,
-        this.canvas.height / 2);
     this.ode.t = null;
     this.ode.y = [0.0, 0.0];
     // Disable controls.
@@ -135,6 +135,13 @@ RcEngine.prototype.stop = function() {
  */
 RcEngine.prototype.draw = function(timestamp) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    if (this.potential === 1) {
+        this.ctx.fillStyle = '#b58900';
+        CanvasHelper.drawCircle(this.ctx, this.odeArgs.cog.x,
+            this.odeArgs.cog.y, 20.0);
+    }
+
     this.editor.draw(!(this.animating));
 
     if (this.animating === true) {
@@ -148,12 +155,6 @@ RcEngine.prototype.draw = function(timestamp) {
         // inactive for some time.
         if (t - this.ode.t > this.maxFrameLength) {
             this.ode.t = t;
-        }
-
-        if (this.potential === 1) {
-            this.ctx.fillStyle = '#b58900';
-            CanvasHelper.drawCircle(this.ctx, this.odeArgs.cog.x,
-                this.odeArgs.cog.y, 20.0);
         }
 
         this.ode.integrate(t);
